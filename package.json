@@ -1,0 +1,9 @@
+{
+  "name": "typescript",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@types/d3": "^7.4.0",
+    "d3": "^7.6.1"
+  }
+}

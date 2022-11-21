@@ -1,0 +1,8 @@
+div#app {
+  display: grid;
+  justify-items: center;
+}
+
+.cell {
+  border: 1px solid black;
+}
