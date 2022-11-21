@@ -25,43 +25,20 @@ for (
     const cell = row[c];
     const cellDescendants = cell.descendants().filter((d) => d.height === 0);
     const y = cell.depth + 1;
-    let splitDescendants = 0;
 
-    if (cell.depth >= splitAtDepth) {
-      split = true;
-    } else {
-      splitDescendants =
-        cell.descendants().filter((d) => d.depth === splitAtDepth).length - 1;
-    }
     let descendantCount = cellDescendants.length;
 
-    if (
-      descendantCount === 1 &&
-      cell.height === 0 &&
-      cell.depth !== splitAtDepth
-    ) {
-      descendantCount = cell.parent
-        .descendants()
-        .filter((d) => d.height === 0).length;
-    }
-    const span = split ? 1 : (descendantCount || 1) + splitDescendants;
-    let d = Array(split ? descendantCount : 1)
-      .fill([
-        {
-          span: span,
+    let span = descendantCount;
 
-          y: y,
-          depth: cell.depth,
-          value: cell.data.value,
-        },
-        { y: y, span: 1, gap: true },
-      ])
+    let d = Array(descendantCount)
+      .fill({
+        span: span,
+        y: y,
+        depth: cell.depth,
+        value: cell.data.value,
+      })
       .flat();
-    d.forEach((c, i, a) => {
-      let previousSpan = i === 0 ? 0 : a[i - 1].span;
-      x += previousSpan;
-      c.x = x;
-    });
+
     outputRow.push(d);
 
     // if (c < row.length - 1) {
@@ -69,15 +46,17 @@ for (
     //   x++;
     // }
   }
-
+  outputRow.forEach((c, i) => {
+    c.x = i + 1;
+  });
   output.push(outputRow.flat());
 }
 
 const columnWidth = 50;
 const gapWidth = 10;
-console.log(output.flat());
 
-const splitRow = output[splitAtDepth];
+const splitRow = output[output.length - 1];
+console.log(splitRow);
 const gridColumns = splitRow
   .map((r) => (r.gap ? `${gapWidth}px` : `${columnWidth}px`))
   .join(' ');
@@ -92,7 +71,7 @@ d3.select('#app')
   .append('div')
   .classed('cell', true)
   .style('grid-column-start', (d) => d.x)
-  .style('grid-column-end', (d) => d.x + d.span)
+  .style('grid-column-end', (d) => d.x + 1)
   .style('grid-row-start', (d, i) => d.y)
   .style('grid-row-end', (d, i) => d.y + 1)
   .html((d, i) => {
