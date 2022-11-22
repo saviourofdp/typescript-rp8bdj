@@ -23,22 +23,28 @@ for (
   let x = 1;
   for (let c = 0; c < row.length; c++) {
     const cell = row[c];
-    const cellDescendants = cell.descendants().filter((d) => d.height === 0);
+    const cellLowestDescendants = cell
+      .descendants()
+      .filter((d) => d.height === 0);
+    const cellImmediateDescendants = cell
+      .descendants()
+      .filter((d) => d.height === cell.height - 1);
     const y = cell.depth + 1;
 
-    let descendantCount = cellDescendants.length;
+    let lowestDescendantCount = cellLowestDescendants.length;
 
-    let span = descendantCount;
+    let span = lowestDescendantCount;
 
-    let d = Array(descendantCount)
+    let d = Array(1)
       .fill({
         span: span,
+        x: x,
         y: y,
         depth: cell.depth,
         value: cell.data.value,
       })
       .flat();
-
+      x += span;
     outputRow.push(d);
 
     // if (c < row.length - 1) {
@@ -46,9 +52,7 @@ for (
     //   x++;
     // }
   }
-  outputRow.forEach((c, i) => {
-    c.x = i + 1;
-  });
+  
   output.push(outputRow.flat());
 }
 
@@ -71,7 +75,7 @@ d3.select('#app')
   .append('div')
   .classed('cell', true)
   .style('grid-column-start', (d) => d.x)
-  .style('grid-column-end', (d) => d.x + 1)
+  .style('grid-column-end', (d) => d.x + d.span)
   .style('grid-row-start', (d, i) => d.y)
   .style('grid-row-end', (d, i) => d.y + 1)
   .html((d, i) => {
